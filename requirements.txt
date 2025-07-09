@@ -1,2 +1,5 @@
-requests
-https://github.com/qb-0/pyMeow/releases/download/1.73.42/pyMeow-1.73.42.zip
+requests>=2.31.0
+mysql-connector-python>=8.1.0
+websocket-client>=1.6.0
+psutil>=5.9.0
+pyMeow>=1.73.42
