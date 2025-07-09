@@ -6,8 +6,17 @@ import sys
 import time
 import uuid
 import requests
-import mysql.connector
-from mysql.connector import Error
+try:
+    import mysql.connector
+    from mysql.connector import Error
+    MYSQL_AVAILABLE = True
+except ImportError:
+    print("MySQL connector not available. Database features will be disabled.")
+    MYSQL_AVAILABLE = False
+    
+    # Create dummy Error class for compatibility
+    class Error(Exception):
+        pass
 import websocket
 import threading
 from datetime import datetime
@@ -73,6 +82,10 @@ class AuthenticationSystem:
 
     def connect_to_database(self):
         """Establish database connection"""
+        if not MYSQL_AVAILABLE:
+            print("MySQL connector not available")
+            return False
+            
         try:
             self.connection = mysql.connector.connect(**self.db_config)
             if self.connection.is_connected():
@@ -106,6 +119,10 @@ class AuthenticationSystem:
 
     def check_versions(self):
         """Check loader and game versions against database"""
+        if not MYSQL_AVAILABLE or not self.connection:
+            print("Database connection not available")
+            return False
+            
         try:
             cursor = self.connection.cursor()
             cursor.execute("SELECT LoaderVersion, GameVersion FROM version_control WHERE id = 1")
@@ -136,6 +153,10 @@ class AuthenticationSystem:
 
     def validate_key_and_hwid(self, key, hwid):
         """Validate authentication key and HWID"""
+        if not MYSQL_AVAILABLE or not self.connection:
+            print("Database connection not available")
+            return False
+            
         try:
             cursor = self.connection.cursor()
             cursor.execute(
