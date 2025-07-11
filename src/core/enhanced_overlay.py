@@ -2,19 +2,23 @@ import pyMeow as pm
 import ctypes
 import os
 import sys
+from ui.auth_window import AuthenticationWindow
 from ui.materials.draw import *
 from ui.controllers.control import *
 from ui.resources.fonts import *
 from core.utils import *
-from core.auth import authenticate_user, is_user_authenticated, cleanup_auth
+from core.auth import auth_system, is_user_authenticated, cleanup_auth
 from features.esp import *
 from features.aimbot import *
 from features.trigger import *
 
 class EnhancedApp:
     def __init__(self):
-        # Initialize authentication first
-        if not authenticate_user():
+        # Show authentication window first
+        auth_window = AuthenticationWindow(auth_system)
+        authenticated = auth_window.run()
+        
+        if not authenticated:
             print("Authentication failed. Exiting...")
             sys.exit(1)
         
