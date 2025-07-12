@@ -73,10 +73,13 @@ class AuthenticationWindow:
                        background='#1b90c4',
                        foreground='#ffffff',
                        font=('Arial', 11, 'bold'),
-                       borderwidth=0)
+                       borderwidth=0,
+                       relief='flat',
+                       padding=(10, 5))
         
         style.map('Custom.TButton',
-                 background=[('active', '#2c8cbf')])
+                 background=[('active', '#2c8cbf')],
+                 relief=[('pressed', 'flat'), ('!pressed', 'flat')])
     
     def create_widgets(self):
         """Create and layout all widgets"""
@@ -99,8 +102,15 @@ class AuthenticationWindow:
         
         # Get and display HWID
         hwid = self.auth_system.get_hwid()
-        self.hwid_label = ttk.Label(hwid_frame, text=hwid[:32] + "...", style='Info.TLabel')
+        self.hwid_label = ttk.Label(hwid_frame, text=hwid[:32] + "...", style='Info.TLabel', cursor='hand2')
         self.hwid_label.pack(pady=(0, 10))
+        
+        # Make HWID clickable to copy
+        self.hwid_label.bind("<Button-1>", lambda e: self.copy_hwid_to_clipboard(hwid))
+        
+        # Add copy instruction
+        copy_instruction = ttk.Label(hwid_frame, text="(Click to copy)", style='Info.TLabel')
+        copy_instruction.pack(pady=(0, 10))
         
         # Key Input Section
         key_frame = tk.Frame(main_frame, bg='#111316', relief='solid', bd=1)
@@ -136,23 +146,38 @@ class AuthenticationWindow:
             # If we have a stored key, show different buttons
             self.verify_button = ttk.Button(button_frame, text="Verify Stored Key", 
                                           style='Custom.TButton', command=self.verify_stored_key)
-            self.verify_button.pack(side='left', padx=(0, 10))
+            self.verify_button.pack(side='left', padx=(0, 10), pady=10)
             
             self.new_key_button = ttk.Button(button_frame, text="Use New Key", 
                                            style='Custom.TButton', command=self.use_new_key)
-            self.new_key_button.pack(side='left')
+            self.new_key_button.pack(side='left', pady=10)
         else:
             self.auth_button = ttk.Button(button_frame, text="Authenticate", 
                                         style='Custom.TButton', command=self.authenticate)
-            self.auth_button.pack(side='left', padx=(0, 10))
+            self.auth_button.pack(side='left', padx=(0, 10), pady=10)
         
         self.exit_button = ttk.Button(button_frame, text="Exit", 
                                     style='Custom.TButton', command=self.exit_app)
-        self.exit_button.pack(side='right')
+        self.exit_button.pack(side='right', pady=10)
         
         # Auto-verify stored key if available
         if self.stored_key:
             self.root.after(1000, self.verify_stored_key)
+    
+    def copy_hwid_to_clipboard(self, hwid):
+        """Copy HWID to clipboard"""
+        try:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(hwid)
+            self.root.update()  # Required for clipboard to work
+            
+            # Show temporary feedback
+            original_text = self.hwid_label.cget('text')
+            self.hwid_label.configure(text="HWID Copied to Clipboard!")
+            self.root.after(2000, lambda: self.hwid_label.configure(text=original_text))
+            
+        except Exception as e:
+            print(f"Error copying to clipboard: {e}")
     
     def load_stored_key(self):
         """Load stored authentication key"""
@@ -245,11 +270,11 @@ class AuthenticationWindow:
         
         self.auth_button = ttk.Button(button_frame, text="Authenticate", 
                                     style='Custom.TButton', command=self.authenticate)
-        self.auth_button.pack(side='left', padx=(0, 10))
+        self.auth_button.pack(side='left', padx=(0, 10), pady=10)
         
         self.exit_button = ttk.Button(button_frame, text="Exit", 
                                     style='Custom.TButton', command=self.exit_app)
-        self.exit_button.pack(side='right')
+        self.exit_button.pack(side='right', pady=10)
     
     def authenticate(self):
         """Authenticate with entered key"""
@@ -348,11 +373,11 @@ class AuthenticationWindow:
             
             self.launch_button = ttk.Button(button_frame, text="Launch Fury", 
                                           style='Custom.TButton', command=self.launch_fury)
-            self.launch_button.pack(side='left', padx=(0, 10))
+            self.launch_button.pack(side='left', padx=(0, 10), pady=10)
             
             self.exit_button = ttk.Button(button_frame, text="Exit", 
                                         style='Custom.TButton', command=self.exit_app)
-            self.exit_button.pack(side='right')
+            self.exit_button.pack(side='right', pady=10)
     
     def launch_fury(self):
         """Launch the main Fury application"""

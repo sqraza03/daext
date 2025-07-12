@@ -155,46 +155,6 @@ class AuthenticationSystem:
         """Validate authentication key and HWID"""
         result = self.validate_key_and_hwid_detailed(key, hwid)
         return result['success']
-    
-    def validate_key_and_hwid_detailed(self, key, hwid):
-        """Validate authentication key and HWID with detailed response"""
-        if not MYSQL_AVAILABLE or not self.connection:
-            print("Database connection not available")
-            return {'success': False, 'error': 'Database connection not available'}
-            
-        try:
-            cursor = self.connection.cursor()
-            cursor.execute(
-                "SELECT hwid, is_valid, expiration_date FROM `keys` WHERE key_value = %s",
-                (key,)
-            )
-            result = cursor.fetchone()
-            
-            if not result:
-                print("Invalid key. Please check your key or contact support.")
-                return {'success': False, 'error': 'Invalid key. Please check your key or contact support.'}
-            
-            db_hwid, is_valid, expiration_date = result
-            
-            # Check if key has expired
-            if expiration_date and datetime.now() > expiration_date:
-                print("The key has expired.")
-                return {'success': False, 'error': 'The key has expired.', 'expiration_date': expiration_date}
-            
-            # Check if key is valid
-            if not is_valid:
-                print("Key is not valid or has been deactivated.")
-                return {'success': False, 'error': 'Key is not valid or has been deactivated.'}
-            
-            # Handle HWID cases
-            if not db_hwid:  # No HWID assigned
-                print("No HWID assigned. Please contact support for HWID binding.")
-                return {'success': False, 'error': 'No HWID assigned. Please contact support for HWID binding.'}
-            
-            if db_hwid != hwid:  # HWID mismatch
-                print("HWID mismatch. You are trying to log in from a different machine.")
-                return {'success': False, 'error': 'HWID mismatch. You are trying to log in from a different machine.'}
-            
             return {'success': True, 'expiration_date': expiration_date}
             
         except Error as e:
