@@ -1,7 +1,24 @@
-from core.enhanced_overlay import *
-from core.security import initialize_security, cleanup_security
 import sys
 import os
+import traceback
+
+# Add the src directory to Python path for imports
+if hasattr(sys, '_MEIPASS'):
+    # Running as PyInstaller bundle
+    sys.path.insert(0, sys._MEIPASS)
+else:
+    # Running as script
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+try:
+    from core.enhanced_overlay import EnhancedApp
+    from core.security import initialize_security, cleanup_security
+except ImportError as e:
+    print(f"Import error: {e}")
+    print("Current working directory:", os.getcwd())
+    print("Python path:", sys.path)
+    input("Press Enter to exit...")
+    sys.exit(1)
 
 def main():
     """Enhanced main function with security"""
