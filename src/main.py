@@ -1,23 +1,41 @@
 import sys
 import os
 import traceback
+import io
 
 # Add the src directory to Python path for imports
 if hasattr(sys, '_MEIPASS'):
     # Running as PyInstaller bundle
     sys.path.insert(0, sys._MEIPASS)
+    sys.path.insert(0, os.path.join(sys._MEIPASS, 'src'))
 else:
     # Running as script
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+
+# Fix stdin issue for PyInstaller
+if not hasattr(sys, 'stdin') or sys.stdin is None:
+    sys.stdin = io.StringIO()
 
 try:
-    from core.enhanced_overlay import EnhancedApp
-    from core.security import initialize_security, cleanup_security
+    # Try different import paths
+    try:
+        from core.enhanced_overlay import EnhancedApp
+        from core.security import initialize_security, cleanup_security
+    except ImportError:
+        # Try absolute imports
+        from src.core.enhanced_overlay import EnhancedApp
+        from src.core.security import initialize_security, cleanup_security
 except ImportError as e:
     print(f"Import error: {e}")
     print("Current working directory:", os.getcwd())
     print("Python path:", sys.path)
-    input("Press Enter to exit...")
+    print("Press any key to exit...")
+    try:
+        input()
+    except:
+        import time
+        time.sleep(5)
     sys.exit(1)
 
 def main():
@@ -43,11 +61,21 @@ def main():
         print("\nApplication interrupted by user")
     except Exception as e:
         print(f"Critical error: {e}")
-        input("Press Enter to exit...")
+        print("Press any key to exit...")
+        try:
+            input()
+        except:
+            import time
+            time.sleep(5)
     finally:
         cleanup_security()
         print("Application closed")
-        input("Press Enter to exit...")
+        print("Press any key to exit...")
+        try:
+            input()
+        except:
+            import time
+            time.sleep(5)
 
 if __name__ == "__main__":
     main()

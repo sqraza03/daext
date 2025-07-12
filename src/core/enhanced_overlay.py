@@ -2,15 +2,28 @@ import pyMeow as pm
 import ctypes
 import os
 import sys
-from ui.auth_window import AuthenticationWindow
-from ui.materials.draw import *
-from ui.controllers.control import *
-from ui.resources.fonts import *
-from core.utils import *
-from core.auth import auth_system, is_user_authenticated, cleanup_auth
-from features.esp import *
-from features.aimbot import *
-from features.trigger import *
+
+try:
+    from ui.auth_window import AuthenticationWindow
+    from ui.materials.draw import *
+    from ui.controllers.control import *
+    from ui.resources.fonts import *
+    from core.utils import *
+    from core.auth import auth_system, is_user_authenticated, cleanup_auth
+    from features.esp import *
+    from features.aimbot import *
+    from features.trigger import *
+except ImportError:
+    # Try with src prefix
+    from src.ui.auth_window import AuthenticationWindow
+    from src.ui.materials.draw import *
+    from src.ui.controllers.control import *
+    from src.ui.resources.fonts import *
+    from src.core.utils import *
+    from src.core.auth import auth_system, is_user_authenticated, cleanup_auth
+    from src.features.esp import *
+    from src.features.aimbot import *
+    from src.features.trigger import *
 
 class EnhancedApp:
     def __init__(self):

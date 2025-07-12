@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import threading
 import time
+import sys
 
 class AuthenticationWindow:
     def __init__(self, auth_system):
@@ -178,6 +179,8 @@ class AuthenticationWindow:
             
         except Exception as e:
             print(f"Error copying to clipboard: {e}")
+            # Fallback: print HWID to console
+            print(f"HWID: {hwid}")
     
     def load_stored_key(self):
         """Load stored authentication key"""
@@ -392,6 +395,11 @@ class AuthenticationWindow:
     
     def exit_app(self):
         """Exit the application"""
+        try:
+            input()
+        except:
+            import time
+            time.sleep(3)
         self.root.destroy()
     
     def run(self):
